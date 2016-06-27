@@ -47,6 +47,12 @@
 		18670D941D0D550F00902723 /* kr-video-player-shrinkscreen@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 18670D7E1D0D550F00902723 /* kr-video-player-shrinkscreen@3x.png */; };
 		18670D951D0D550F00902723 /* return_white@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 18670D7F1D0D550F00902723 /* return_white@2x.png */; };
 		18670D981D0D552F00902723 /* CHPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 18670D971D0D552F00902723 /* CHPlayerView.m */; };
+		189F83021D20CA40003C125C /* fullScreen.gif in Resources */ = {isa = PBXBuildFile; fileRef = 189F82FC1D20CA40003C125C /* fullScreen.gif */; };
+		189F83031D20CA40003C125C /* navigation1.gif in Resources */ = {isa = PBXBuildFile; fileRef = 189F82FD1D20CA40003C125C /* navigation1.gif */; };
+		189F83041D20CA40003C125C /* navigation2.gif in Resources */ = {isa = PBXBuildFile; fileRef = 189F82FE1D20CA40003C125C /* navigation2.gif */; };
+		189F83051D20CA40003C125C /* noNavigation1.gif in Resources */ = {isa = PBXBuildFile; fileRef = 189F82FF1D20CA40003C125C /* noNavigation1.gif */; };
+		189F83061D20CA40003C125C /* noNavigation2.gif in Resources */ = {isa = PBXBuildFile; fileRef = 189F83001D20CA40003C125C /* noNavigation2.gif */; };
+		189F83071D20CA40003C125C /* noNavigation3.gif in Resources */ = {isa = PBXBuildFile; fileRef = 189F83011D20CA40003C125C /* noNavigation3.gif */; };
 		E97E8152820AD1FAAFAE5FB0 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A3A31D0D321442CC4273A6FB /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -128,6 +134,12 @@
 		18670D7F1D0D550F00902723 /* return_white@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "return_white@2x.png"; sourceTree = "<group>"; };
 		18670D961D0D552F00902723 /* CHPlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHPlayerView.h; sourceTree = "<group>"; };
 		18670D971D0D552F00902723 /* CHPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHPlayerView.m; sourceTree = "<group>"; };
+		189F82FC1D20CA40003C125C /* fullScreen.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = fullScreen.gif; sourceTree = "<group>"; };
+		189F82FD1D20CA40003C125C /* navigation1.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = navigation1.gif; sourceTree = "<group>"; };
+		189F82FE1D20CA40003C125C /* navigation2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = navigation2.gif; sourceTree = "<group>"; };
+		189F82FF1D20CA40003C125C /* noNavigation1.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = noNavigation1.gif; sourceTree = "<group>"; };
+		189F83001D20CA40003C125C /* noNavigation2.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = noNavigation2.gif; sourceTree = "<group>"; };
+		189F83011D20CA40003C125C /* noNavigation3.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = noNavigation3.gif; sourceTree = "<group>"; };
 		18F8C9E71D113F8300617A9B /* CHPlayerHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHPlayerHeader.h; sourceTree = "<group>"; };
 		7AFE6C0DC12EE8F09B0FD2FA /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		A3A31D0D321442CC4273A6FB /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -239,6 +251,7 @@
 		18670CD71D0D3A3F00902723 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				189F82FB1D20CA40003C125C /* gif */,
 				182DA7AC1D17C47E009DA79C /* cat.png */,
 				18670CD81D0D3A3F00902723 /* main.m */,
 			);
@@ -315,6 +328,19 @@
 				182DA7C71D17CBAD009DA79C /* UIViewController+CH_baseSet.m */,
 			);
 			path = Tools;
+			sourceTree = "<group>";
+		};
+		189F82FB1D20CA40003C125C /* gif */ = {
+			isa = PBXGroup;
+			children = (
+				189F82FC1D20CA40003C125C /* fullScreen.gif */,
+				189F82FD1D20CA40003C125C /* navigation1.gif */,
+				189F82FE1D20CA40003C125C /* navigation2.gif */,
+				189F82FF1D20CA40003C125C /* noNavigation1.gif */,
+				189F83001D20CA40003C125C /* noNavigation2.gif */,
+				189F83011D20CA40003C125C /* noNavigation3.gif */,
+			);
+			path = gif;
 			sourceTree = "<group>";
 		};
 		ABAF08FBA80BE772EA4F3B8F /* Frameworks */ = {
@@ -441,18 +467,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				18670D851D0D550F00902723 /* 全屏@3x.png in Resources */,
+				189F83071D20CA40003C125C /* noNavigation3.gif in Resources */,
 				18670CE71D0D3A3F00902723 /* LaunchScreen.storyboard in Resources */,
 				18670D811D0D550F00902723 /* 播放@3x.png in Resources */,
 				18670D821D0D550F00902723 /* 后退@2x.png in Resources */,
 				18670D931D0D550F00902723 /* kr-video-player-shrinkscreen@2x.png in Resources */,
+				189F83021D20CA40003C125C /* fullScreen.gif in Resources */,
 				18670D801D0D550F00902723 /* 播放@2x.png in Resources */,
+				189F83051D20CA40003C125C /* noNavigation1.gif in Resources */,
 				18670D941D0D550F00902723 /* kr-video-player-shrinkscreen@3x.png in Resources */,
 				18670D8A1D0D550F00902723 /* 暂停@3x.png in Resources */,
 				18670CE41D0D3A3F00902723 /* Assets.xcassets in Resources */,
 				18670D951D0D550F00902723 /* return_white@2x.png in Resources */,
 				18670D871D0D550F00902723 /* 椭圆-1@2x.png in Resources */,
 				18670D8C1D0D550F00902723 /* kr-video-player-close@3x.png in Resources */,
+				189F83031D20CA40003C125C /* navigation1.gif in Resources */,
 				18670D841D0D550F00902723 /* 全屏@2x.png in Resources */,
+				189F83061D20CA40003C125C /* noNavigation2.gif in Resources */,
 				18670D8E1D0D550F00902723 /* kr-video-player-fullscreen@3x.png in Resources */,
 				18670D831D0D550F00902723 /* 前进@2x.png in Resources */,
 				18670D8B1D0D550F00902723 /* kr-video-player-close@2x.png in Resources */,
@@ -461,6 +492,7 @@
 				18670D881D0D550F00902723 /* 椭圆-1@3x.png in Resources */,
 				18670D861D0D550F00902723 /* 视频返回@2x.png in Resources */,
 				18670D8D1D0D550F00902723 /* kr-video-player-fullscreen@2x.png in Resources */,
+				189F83041D20CA40003C125C /* navigation2.gif in Resources */,
 				18670D891D0D550F00902723 /* 暂停@2x.png in Resources */,
 				182DA7AD1D17C47E009DA79C /* cat.png in Resources */,
 			);

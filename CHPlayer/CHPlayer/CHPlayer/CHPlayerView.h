@@ -6,6 +6,15 @@
 //  Copyright © 2016年 Hxc. All rights reserved.
 //
 
+
+
+//  github  https://github.com/coopsif/CHPlayer
+//  简书     http://www.jianshu.com/p/232c16ad1da6
+
+
+
+
+
 #import <UIKit/UIKit.h>
 
 typedef void(^BackClickBlock)();
