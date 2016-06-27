@@ -88,7 +88,7 @@
 
 //设置是否支持自动旋转 默认开启
 - (BOOL)shouldAutorotate{
-     return NO;
+     return YES;
 }
 // 支持旋转的方向
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations{

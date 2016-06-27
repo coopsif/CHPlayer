@@ -18,6 +18,16 @@
 
 @implementation LeftViewController
 
+- (void)viewWillAppear:(BOOL)animated{
+     [super viewWillAppear:animated];
+     [[NSNotificationCenter defaultCenter] postNotificationName:CHPlayerContinuePlayNotification object:self.playerView];
+}
+
+- (void)viewWillDisappear:(BOOL)animated{
+     [super viewWillDisappear:animated];
+     [[NSNotificationCenter defaultCenter] postNotificationName:CHPlayerStopPlayNotification object:self.playerView];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.

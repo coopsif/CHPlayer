@@ -7,12 +7,12 @@
 //
 
 #import "PlayOnFullScreenViewController.h"
-//#import "CHPlayerView.h"
+#import "CHPlayerView.h"
 #define WS(weakSelf)  __weak __typeof(&*self)weakSelf = self
 
 @interface PlayOnFullScreenViewController ()
 
-//@property (strong, nonatomic) CHPlayerView * playerView;
+@property (strong, nonatomic) CHPlayerView * playerView;
 
 @end
 
@@ -22,7 +22,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
      
-     /*
+     
      NSString *strUrl = @"http://he.yinyuetai.com/uploads/videos/common/080A01550943F9C13EED24FBF1933A39.flv?sc=aabb162ef563e9b2&br=3106&rd=iOS";
      CHPlayerView * playerView = [[CHPlayerView alloc] initWithFrame:self.view.bounds playerType:PlayerTypeOfFullScreen autoPlay:YES];
      [self.view addSubview:playerView];
@@ -50,7 +50,7 @@
      };
 
 #warning playerEndBlock playerFullEndToBackBlock 两者不能并存 根据需求选择其中回调
-     */
+     
      
 }
 
