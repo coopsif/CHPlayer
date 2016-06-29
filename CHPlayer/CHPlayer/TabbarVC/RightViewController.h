@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "CHPlayerHeader.h"
 @interface RightViewController : UIViewController
 
 @end

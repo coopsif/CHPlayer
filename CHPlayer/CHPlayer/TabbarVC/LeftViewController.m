@@ -60,6 +60,12 @@
 }
 
 
+//设置是否支持自动旋转 默认开启 == 配合锁屏
+- (BOOL)shouldAutorotate{
+     NSNumber *lock = [[NSUserDefaults standardUserDefaults] objectForKey:CHPlayer_LockScreen];
+     return ![lock boolValue];
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

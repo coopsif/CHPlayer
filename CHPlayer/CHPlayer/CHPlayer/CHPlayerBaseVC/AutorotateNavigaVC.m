@@ -20,6 +20,7 @@
 }
 
 - (BOOL)shouldAutorotate{
+
      return [self.visibleViewController shouldAutorotate];
 }
 

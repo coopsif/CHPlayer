@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "CHPlayerView.h"
+#import "CHPlayerHeader.h"
 @interface VideoPlayerViewController : UIViewController
 
 @property(nonatomic,assign)CHPlayerType type;

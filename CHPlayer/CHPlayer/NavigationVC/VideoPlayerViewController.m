@@ -8,7 +8,7 @@
 
 #import "VideoPlayerViewController.h"
 #import <Masonry.h>
-#import "UIView+CH_tapAction.h"
+#import "UIView+CH_GestureRecognizer.h"
 #define WS(weakSelf)  __weak __typeof(&*self)weakSelf = self
 //屏幕宽度
 #define  CHPlayer_W [[UIScreen mainScreen] bounds].size.width
@@ -121,6 +121,16 @@
      //[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.baidu.com"]];
      
      [self.navigationController pushViewController:[UIViewController new] animated:YES];
+}
+
+
+
+//设置是否支持自动旋转 默认开启 == 配合锁屏
+- (BOOL)shouldAutorotate{
+     
+     if (self.type == PlayerTypeOfFullScreen) return YES;
+     NSNumber *lock = [[NSUserDefaults standardUserDefaults] objectForKey:CHPlayer_LockScreen];
+     return ![lock boolValue];
 }
 
 

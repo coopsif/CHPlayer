@@ -10,7 +10,7 @@
 #import "NSString+CH_stringWidthAndHeight.h"
 #import "NSTimer+Ch_helper.h"
 #import "CHPlayerHeader.h"
-#import "UIView+CH_tapAction.h"
+#import "UIView+CH_GestureRecognizer.h"
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -40,12 +40,15 @@ typedef NS_ENUM(NSInteger, GestureType){
 @property (nonatomic, strong) UIView *topView;//头部视图
 
 //未全屏
-@property (nonatomic ,strong)UIImageView *backView;//返回按钮
-@property (nonatomic ,strong)UIImageView *moreView;//更多操作
+@property (nonatomic ,strong) UIImageView *backView;//返回按钮
+@property (nonatomic ,strong) UIImageView *moreView;//更多操作
 
 //全屏才展示
 @property (nonatomic, strong) UILabel *titleLabel;//视频标题
 @property (nonatomic, strong) UIView *backImageButton;//返回 -- 全屏才显示
+/// 屏幕锁定按钮
+@property (nonatomic, strong) UIButton *lockButton;
+
 @property (nonatomic, strong) UIView *downImageButton;//下载视频
 
 /** == 快进模块 == **/
@@ -55,9 +58,7 @@ typedef NS_ENUM(NSInteger, GestureType){
 @property (nonatomic, strong) NSTimer *fastTimer;//定时器 -- 1/2 秒后快进视图
 
 @property (nonatomic, assign) NSInteger fastTimerCount;//定时器 -- 1/2 秒后快进视图
-@property (nonatomic, assign) NSInteger fastCount;//滑动数
-@property (nonatomic, assign) NSInteger startCount;//滑动数
-@property (nonatomic, assign) CGFloat   timeLength;//滑动数
+@property (nonatomic, assign) CGFloat   timeLength;//时间Label宽度
 
 
 /** == 中间提示模块 == **/
@@ -81,9 +82,9 @@ typedef NS_ENUM(NSInteger, GestureType){
 @property (nonatomic, assign) NSInteger timerNub;//定时器计数
 @property (nonatomic, assign) BOOL isDarw;//是否拖拽
 @property (nonatomic, assign) BOOL tapShow;//点击显示 ？隐藏
+@property (nonatomic, assign) BOOL isFullScreen;//是否是全屏
+@property (nonatomic, assign) CGFloat cMTimeRange;//缓存数值
 
-@property (nonatomic, readonly) CGFloat sliderWidth;//滑动条宽度
-@property (nonatomic, readonly) CGFloat progressWidth;//缓存进度宽度
 @property (nonatomic, readonly) CGFloat currentValue;//当前播放进度值
 @property (nonatomic, assign) CGRect orgFrame;//未旋转屏幕的Frame
 @property (nonatomic, assign) CGPoint originalLocation;//原始触点
@@ -144,8 +145,9 @@ typedef NS_ENUM(NSInteger, GestureType){
           self.orgFrame        = frame;
           self.layer.masksToBounds = YES;
           [self initialization];
-          
+          [[NSUserDefaults standardUserDefaults] setObject:@(NO) forKey:CHPlayer_LockScreen];//设置默认不锁屏
           if (self.playerType == PlayerTypeOfFullScreen) {//全屏
+               self.isFullScreen = YES;
                [self deviceOrientation:UIInterfaceOrientationLandscapeRight annimation:YES];
           }
           UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -276,7 +278,7 @@ typedef NS_ENUM(NSInteger, GestureType){
      
      if (orientation == UIInterfaceOrientationLandscapeRight ||orientation == UIInterfaceOrientationLandscapeLeft) // home键靠左右
      {
-          
+          self.isFullScreen = YES;
           [self vieWscrollEnabled:NO];
           [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
           //DLog(@" ==home键靠右== %ld",(long)orientation);
@@ -290,14 +292,24 @@ typedef NS_ENUM(NSInteger, GestureType){
           self.topView.hidden  = /*self.highLabel.hidden = self.selectLabel.hidden = */[self.container viewWithTag:9999].hidden = NO;
           //全屏 隐藏导航栏
           if (self.playerType == PlayerTypeOfNavigationBar ||self.playerType == PlayerTypeOfFullScreen) [self setNavigationBarHidden:YES];
+          
+          if (self.playerType != PlayerTypeOfFullScreen) {
+               [self showView];
+               self.tapShow = NO;
+          }
      }
      
      if (orientation == UIInterfaceOrientationPortrait)
      {
-          [self vieWscrollEnabled:YES];
-          //DLog(@" ==home键回位== %ld",(long)orientation);
-          CGFloat w = self.orientation == UIInterfaceOrientationPortrait?self.orgFrame.size.width:CHPlayer_W;
+          //小屏 显示导航栏
+          [self backNavigationBar];
           [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+          if (self.playerType == PlayerTypeOfFullScreen) return;
+          
+          self.isFullScreen = NO;
+          [self vieWscrollEnabled:YES];
+
+          CGFloat w = self.orientation == UIInterfaceOrientationPortrait?self.orgFrame.size.width:CHPlayer_W;
           [self mas_remakeConstraints:^(MASConstraintMaker *make) {
                make.left.equalTo(@(self.orgFrame.origin.x));
                make.top.equalTo(@(self.orgFrame.origin.y));
@@ -306,8 +318,9 @@ typedef NS_ENUM(NSInteger, GestureType){
           }];
           self.backView.hidden = self.moreView.hidden = self.zoneView.hidden = NO;
           self.topView.hidden  = self.highLabel.hidden = self.selectLabel.hidden = [self.container viewWithTag:9999].hidden = YES;
-          //小屏 显示导航栏
-          [self backNavigationBar];
+          [UIView animateWithDuration:CH_annimationTime animations:^{
+               self.lockButton.alpha = 0;
+          }];
      }
      [self upTimeLabelWidth];
 }
@@ -337,13 +350,6 @@ typedef NS_ENUM(NSInteger, GestureType){
 
 - (UIViewController*)ViewController{
      id nextResponder = nil;
-//     UIView *superView;
-//     if ([self.superview isKindOfClass:[UIScrollView class]]) {
-//          UIScrollView *superTabview = (UIScrollView *)self.superview;
-//          superView = superTabview.superview;
-//     }else{
-//          superView = self.superview;
-//     }
      nextResponder = [self nextResponder];
      while (nextResponder) {
           if ([nextResponder isKindOfClass:[UIViewController class]]){
@@ -410,6 +416,8 @@ typedef NS_ENUM(NSInteger, GestureType){
 }
 
 - (void)orgSet{
+     
+     self.cMTimeRange    = 0;
      self.timeLabel.text = @"00:00/00:00";
      [self.progressView setProgress:0 animated:NO];
      [self.playerSlier  setValue:0 animated:NO];
@@ -486,8 +494,11 @@ typedef NS_ENUM(NSInteger, GestureType){
      [self.playerCenterLabel addTapCallBack:self sel:@selector(tapAgainPlayAction)];
      //非自动播放 播放事件
      [self.playImgView addTapCallBack:self sel:@selector(tapPlayAction)];
-}
+     
+     //锁屏事件
+     [self.lockButton addTarget:self action:@selector(lockAction:) forControlEvents:UIControlEventTouchUpInside];
 
+}
 
 /////////////////////////////////////////////////////视图事件区域////////////////////////////////////////////////////////////
 /**
@@ -523,6 +534,8 @@ typedef NS_ENUM(NSInteger, GestureType){
  */
 - (void)doubleTapAction{
      
+     if (self.lockButton.selected) return;//锁屏 关闭双击旋转
+     
      UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
      if (orientation == UIInterfaceOrientationLandscapeRight ||orientation ==UIInterfaceOrientationLandscapeLeft) // home键靠左右
      {
@@ -544,9 +557,10 @@ typedef NS_ENUM(NSInteger, GestureType){
      //1003全屏 1004非全屏
      [self repeatsTimer];
      if (tag == 1003) {
+          
           [self deviceOrientation:UIInterfaceOrientationLandscapeRight annimation:YES];
      }else{
-     
+          
           [self deviceOrientation:UIInterfaceOrientationPortrait annimation:YES];
           if (self.playerType == PlayerTypeOfFullScreen) {
                if (self.backClickBlock){
@@ -563,6 +577,7 @@ typedef NS_ENUM(NSInteger, GestureType){
      NSTimeInterval an = annimation?CH_annimationTime:0;
      [UIView animateWithDuration:an
                       animations:^{
+                           
                            NSNumber *value = [NSNumber numberWithInt:orientation];
                            [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
                       }];
@@ -578,6 +593,11 @@ typedef NS_ENUM(NSInteger, GestureType){
 
 - (void)showView{
      
+     if (self.isFullScreen && self.lockButton.selected) {
+          [self showLockButton];
+          return;
+     }
+     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(autoHideLockButton) object:nil];
      [UIView animateWithDuration:CH_annimationTime animations:^{
           self.bottomView.alpha = self.topView.alpha = 1;
           [self.container viewWithTag:9999].alpha = [self.container viewWithTag:9998].alpha = 0.7;
@@ -585,6 +605,7 @@ typedef NS_ENUM(NSInteger, GestureType){
                [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:UIStatusBarAnimationFade];
           }
           self.backView.alpha =  self.moreView.alpha  = self.playerType == PlayerTypeOfNoNavigationBar?1:0;
+          self.lockButton.alpha = self.isFullScreen?1:0;
      }];
      [self repeatsTimer];
 }
@@ -592,12 +613,29 @@ typedef NS_ENUM(NSInteger, GestureType){
 - (void)hideView{
      
      [UIView animateWithDuration:CH_annimationTime animations:^{
-          self.bottomView.alpha = self.topView.alpha = self.backView.alpha = self.moreView.alpha = [self.container viewWithTag:9999].alpha = [self.container viewWithTag:9998].alpha = 0;
+          self.bottomView.alpha = self.topView.alpha = self.backView.alpha = self.moreView.alpha = [self.container viewWithTag:9999].alpha = [self.container viewWithTag:9998].alpha = self.lockButton.alpha = 0;
           if (self.playerType == PlayerTypeOfNoNavigationBar) {
                [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationFade];
           }
      }];
      [self getZeroData];
+}
+
+- (void)autoHideLockButton{
+     
+     self.tapShow = YES;
+     [UIView animateWithDuration:CH_annimationTime animations:^{
+          self.lockButton.alpha = 0;
+     }];
+}
+
+- (void)showLockButton{
+     
+     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(autoHideLockButton) object:nil];
+     [UIView animateWithDuration:CH_annimationTime animations:^{
+          self.lockButton.alpha = 1;
+     }];
+     [self performSelector:@selector(autoHideLockButton) withObject:nil afterDelay:CH_showViewTime];
 }
 
 /**
@@ -615,9 +653,7 @@ typedef NS_ENUM(NSInteger, GestureType){
      self.timer = [NSTimer ch_scheduledTimerWithTimeInterval:1.0f block:^{
           _timerNub++;
           if (_timerNub == CH_showViewTime) {
-               [weakSelf hideView];
-               weakSelf.tapShow = YES;
-               [weakSelf removeRepeatsTimer];
+               [weakSelf manualHideView];
           }
      } repeats:YES];
 }
@@ -628,6 +664,13 @@ typedef NS_ENUM(NSInteger, GestureType){
           self.timer = nil;
           self.timerNub = 0;
      }
+}
+
+- (void)manualHideView{
+     
+     [self hideView];
+     self.tapShow = YES;
+     [self removeRepeatsTimer];
 }
 
 #pragma mark ------- 播放事件
@@ -654,11 +697,14 @@ typedef NS_ENUM(NSInteger, GestureType){
 }
 
 - (void)sliderAction:(UISlider *)sender{
+     
+     //[[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(setIsDarw) object:nil];
+     _isDarw = YES;
+     
      CGFloat value = sender.value;
      if (value>=sender.maximumValue) value -= 3;
      CMTime time = CMTimeMake(value, 1);
      _currentValue = value;
-     _isDarw = YES;
      if (self.player.status != AVPlayerStatusReadyToPlay) return;
      WS(weasSelf);
      //快进
@@ -689,6 +735,14 @@ typedef NS_ENUM(NSInteger, GestureType){
      [self removeObserver];
      
 }
+
+- (void)lockAction:(UIButton *)sender{
+     sender.selected = !sender.selected;
+     sender.selected?[self manualHideView]:[self showView];
+     [[NSUserDefaults standardUserDefaults] setObject:@(sender.selected) forKey:CHPlayer_LockScreen];
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -738,13 +792,18 @@ typedef NS_ENUM(NSInteger, GestureType){
           }
      }else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {//缓存
 
-          NSTimeInterval timeInterval = [self availableDuration];// 计算缓冲进度
           CMTime duration = self.playerItem.duration;
           CGFloat totalDuration = CMTimeGetSeconds(duration);
-          if (timeInterval>=totalDuration) return;
-          CGFloat value = timeInterval / totalDuration;
-          //DLog(@"===%f",value);
-          [self.progressView setProgress:value animated:YES];
+          double totalTime   = floor(totalDuration);
+          
+          if (self.cMTimeRange != totalTime) {
+               self.cMTimeRange = floor([self availableDuration]);// 计算缓冲进度
+               CGFloat value = self.cMTimeRange / totalDuration;
+               [self.progressView setProgress:value animated:YES];
+          }else{
+               [self.progressView setProgress:1 animated:YES];
+          }
+          
      }else if([keyPath isEqualToString:@"playbackBufferEmpty"]){
           
           if (self.playerItem.playbackBufferEmpty) {//空缓存
@@ -803,13 +862,13 @@ typedef NS_ENUM(NSInteger, GestureType){
  *
  *  @return 缓冲的进度值
  */
-- (NSTimeInterval)availableDuration {
+- (double)availableDuration {
      
      NSArray *loadedTimeRanges = [[self.player currentItem] loadedTimeRanges];
      CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];// 获取缓冲区域
-     float startSeconds = CMTimeGetSeconds(timeRange.start);
-     float durationSeconds = CMTimeGetSeconds(timeRange.duration);
-     NSTimeInterval result = startSeconds + durationSeconds;// 计算缓冲总进度
+     double startSeconds = CMTimeGetSeconds(timeRange.start);
+     double durationSeconds = CMTimeGetSeconds(timeRange.duration);
+     double result = startSeconds + durationSeconds;// 计算缓冲总进度
      return result;
 }
 
@@ -828,7 +887,6 @@ typedef NS_ENUM(NSInteger, GestureType){
                     [weakSelf updateVideoSlider:current];
                }
                NSString *cuTime = [NSString stringWithFormat:@"%02d:%02d/%@",(int)current / 60,(int)current % 60,weakSelf.totalTime];
-               //DLog(@"===%@",cuTime);
                weakSelf.timeLabel.text = cuTime;
                if ([weakSelf returnTimeWidth]>= weakSelf.timeLength) {
                     [weakSelf upTimeLabelWidth];
@@ -900,6 +958,7 @@ typedef NS_ENUM(NSInteger, GestureType){
      }];
      
      MASAttachKeys(bottomAlphaBgView);
+     MASAttachKeys(self);
      
      //加载视图
      self.activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
@@ -918,6 +977,24 @@ typedef NS_ENUM(NSInteger, GestureType){
      [self.tapView mas_makeConstraints:^(MASConstraintMaker *make) {
           make.edges.equalTo(self.container);
      }];
+     
+     if (self.playerType != PlayerTypeOfFullScreen) {//全屏类型 无锁屏控件
+          
+          //锁屏 全屏才显示
+          self.lockButton =[UIButton buttonWithType:UIButtonTypeCustom];
+          [self.lockButton setImage:[UIImage imageNamed:CH_full_unLockIcon] forState:UIControlStateNormal];
+          [self.lockButton setImage:[UIImage imageNamed:CH_full_lockIcon] forState:UIControlStateHighlighted];
+          [self.lockButton setImage:[UIImage imageNamed:CH_full_lockIcon] forState:UIControlStateSelected];
+          self.lockButton.contentEdgeInsets = UIEdgeInsetsMake(5, 0, -5, 0);
+          [self.container addSubview:self.lockButton];
+          self.lockButton.alpha = 0;
+          [self.lockButton mas_makeConstraints:^(MASConstraintMaker *make) {
+               make.left.equalTo(@(20));
+               make.centerY.equalTo(self.container.mas_centerY);
+               make.height.with.equalTo(@(70));
+          }];
+
+     }
      
      //头部模块
      self.topView = [UIView new];
@@ -1229,6 +1306,7 @@ typedef NS_ENUM(NSInteger, GestureType){
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
      
      if (self.cellContainer.alpha != 0 && self.cellContainer)return;
+     if (self.lockButton.selected) return;//锁屏
      
      UITouch *touch = [touches anyObject];
      CGPoint currentLocation = [touch locationInView:self];
